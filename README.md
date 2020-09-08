@@ -175,55 +175,79 @@
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 
 ```
-cd courseRegistrationSystem
+cd gaji-gateway
 mvn spring-boot:run
 
-cd paymentSystem
-mvn spring-boot:run 
+cd gaji-member
+mvn spring-boot:run
 
-cd lectureSystem
-mvn spring-boot:run  
+cd gaji-product
+mvn spring-boot:run
+
+cd gaji-purchase
+mvn spring-boot:run
+
+cd gaji-payment
+mvn spring-boot:run
+
+cd gaji-mypage
+mvn spring-boot:run
+
+
 ```
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 paymentSystem 마이크로 서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하였다. 모델링 시에 영문화 완료하였기 때문에 그대로 개발하는데 큰 지장이 없었다.
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 Purchase 마이크로 서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하였다. 모델링 시에 영문화 완료하였기 때문에 그대로 개발하는데 큰 지장이 없었다.
 
 ```
-package skademy;
+package GAJI;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
 import java.util.List;
 
 @Entity
-@Table(name="PaymentSystem_table")
-public class PaymentSystem {
+@Table(name="Purchase_table")
+public class Purchase {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private Long courseId;
+    private Long memberId;
+    private Long productId;
+    private String status = "Purchased";
+
+    @PostUpdate
+    public void onPostUpdate(){
+        Canceled canceled = new Canceled();
+        BeanUtils.copyProperties(this, canceled);
+        canceled.publishAfterCommit();
+
+
+    }
 
     @PostPersist
     public void onPostPersist(){
-        try {
-            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Bought bought = new Bought();
+        BeanUtils.copyProperties(this, bought);
+        bought.publishAfterCommit();
 
-        PaymentCompleted paymentCompleted = new PaymentCompleted();
-        BeanUtils.copyProperties(this, paymentCompleted);
-        paymentCompleted.publish();
+        //Following code causes dependency to external APIs
+        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+        GAJI.external.Payment payment = new GAJI.external.Payment();
+        // mappings goes here
+        payment.setPurchaseId(this.getId());
+        payment.setProductId(this.getProductId());
+        payment.setStatus("Payment Completed");
+
+        PurchaseApplication.applicationContext.getBean(GAJI.external.PaymentService.class)
+            .doPayment(payment);
+
+
     }
 
-    @PostRemove
-    public void onPostRemove(){
-        PaymentCanceled paymentCanceled = new PaymentCanceled();
-        BeanUtils.copyProperties(this, paymentCanceled);
-        paymentCanceled.publish();
-    }
 
     public Long getId() {
         return id;
@@ -232,37 +256,57 @@ public class PaymentSystem {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getCourseId() {
-        return courseId;
+    public Long getMemberId() {
+        return memberId;
     }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
     }
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+ 
 }
+
+
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 ```
-package skademy;
+package GAJI;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PaymentSystemRepository extends PagingAndSortingRepository<PaymentSystem, Long>{
+public interface PurchaseRepository extends PagingAndSortingRepository<Purchase, Long>{
+ 
 }
 ```
 - 적용 후 REST API 의 테스트
 ```
-# courseRegistrationSystem 서비스의 수강신청 처리
-http POST localhost:8081/courseRegistrationSystem lectureId=1
+# purchase 서비스의 구매 처리
+http POST localhost:8081/purchases product=10 memberId=300
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857038-272bad00-8408-11ea-8096-7f54b482ea54.png)
+![purchase_post](https://user-images.githubusercontent.com/68408645/92456324-bdb50b00-f1fd-11ea-93b1-58cdcba3434c.png)
+
 
 
 ```
 # 주문 상태 확인
-http localhost:8081/courseRegistrationSystem
+http localhost:8081/purchases
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857153-4d514d00-8408-11ea-83be-cf9e002c9ce5.png)
+![puchase_get](https://user-images.githubusercontent.com/68408645/92456399-d45b6200-f1fd-11ea-8ddf-d1ed1775739f.png)
+
 
 
 
