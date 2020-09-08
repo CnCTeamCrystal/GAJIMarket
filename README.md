@@ -453,20 +453,21 @@ mvn spring-boot:run
 각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 Azure를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 azure-pipeline.yml 에 포함되었다.
 
 - devops를 활용하여 pipeline을 구성하였고, CI CD 자동화를 구현하였다.
-![image](https://user-images.githubusercontent.com/18453570/79851343-2262fb00-8400-11ea-85e9-b4627f9a6d0d.PNG)
+![cicd](https://user-images.githubusercontent.com/68408645/92461338-230bfa80-f204-11ea-8bdf-4687b6b69ed8.png)
 
 - 아래와 같이 pod 가 정상적으로 올라간 것을 확인하였다.
-![image](https://user-images.githubusercontent.com/18453570/79851342-21ca6480-8400-11ea-914a-e80e14ea93c7.PNG)
+![pod](https://user-images.githubusercontent.com/68408645/92461006-a711b280-f203-11ea-9169-20c0393b1114.PNG)
 
 - 아래와 같이 쿠버네티스에 모두 서비스로 등록된 것을 확인할 수 있다.
-![image](https://user-images.githubusercontent.com/18453570/79851335-20993780-8400-11ea-988b-33018c526631.PNG)
+![kube all](https://user-images.githubusercontent.com/68408645/92461109-cb6d8f00-f203-11ea-81b6-e439b81ebf07.PNG)
+
 
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 수강신청(courseRegistration)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 구매(purchase)-->결제(payment) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -474,7 +475,6 @@ mvn spring-boot:run
 
 hystrix:
   command:
-    # 전역설정
     default:
       execution.isolation.thread.timeoutInMilliseconds: 610
 
@@ -482,7 +482,7 @@ hystrix:
 
 - 피호출 서비스(결제:payment) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
 ```
-# (paymentSystem) PaymentSystem.java (Entity)
+# (payment) Payment.java (Entity)
 
     @PostPersist
     public void onPostPersist(){  //결제이력을 저장한 후 적당한 시간 끌기
@@ -498,8 +498,13 @@ hystrix:
 ```
 
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
-- 동시사용자 100명
-- 120초 동안 실시
+- 동시사용자 1명
+- 20초 동안 10번 반복
+
+![circuit](https://user-images.githubusercontent.com/68408645/92460153-944aae00-f202-11ea-9eca-a6ddde0eb79f.png)
+
+- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음. 하지만, 66.62% 가 성공하였고, 33.38%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
+
 
 
 * 요청이 과도하여 CB를 동작함 요청을 차단
