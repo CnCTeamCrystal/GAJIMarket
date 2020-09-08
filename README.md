@@ -386,46 +386,42 @@ http POST localhost:8081/Purchases productId=2   #Success
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
 
-결제가 이루어진 후에 수강신청시스템으로 이를 알려주는 행위는 동기식이 아니라 비 동기식으로 처리하여 수강신청 완료처리를 위하여 결제가 블로킹 되지 않도록 처리한다.
+결제가 이루어진 후에 Product(상품)으로 이를 알려주는 행위는 동기식이 아니라 비 동기식으로 처리하여 상품 상태 update 처리를 위하여 결제가 블로킹 되지 않도록 처리한다.
  
 - 이를 위하여 결제시스템에 기록을 남긴 후에 곧바로 결제완료이 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
  
 ```
 ...
-    @PostPersist
+   @PostPersist
     public void onPostPersist(){
-   
         PaymentCompleted paymentCompleted = new PaymentCompleted();
         BeanUtils.copyProperties(this, paymentCompleted);
-        paymentCompleted.publish();
+        paymentCompleted.publishAfterCommit();
+ 
     }
 
 ```
-- 수강신청 서비스에서는 결제완료 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
+- 구매 서비스에서는 결제완료 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다:
 
 ```
 public class PolicyHandler{
  ...
     
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverPaymentCompleted_수강신청완료(@Payload PaymentCompleted paymentCompleted){
-        try {
-            if (paymentCompleted.isMe()) {
-                System.out.println("##### listener 수강신청완료 : " + paymentCompleted.toJson());
-                Optional<CourseRegistrationSystem> courseRegistrationSystemOptional = courseRegistrationSystemRepository.findById(paymentCompleted.getCourseId());
-                CourseRegistrationSystem courseRegistrationSystem = courseRegistrationSystemOptional.get();
-                courseRegistrationSystem.setStatus("결제 완료");
-                courseRegistrationSystem.setStudentId(courseRegistrationSystem.getStudentId());
+    public void wheneverPaymentCompleted_StatusChange(@Payload PaymentCompleted paymentCompleted){
 
-                courseRegistrationSystemRepository.save(courseRegistrationSystem);
-            }
-        }catch(Exception e) {
+        if(paymentCompleted.isMe()){
+            Optional<Product> productOptional = productRepository.findById(paymentCompleted.getProductId());
 
+            Product product = productOptional.get();
+            product.setStatus("Sold out");
+            productRepository.save(product);
         }
+
     }
 
 ```
-강의 시스템은 수강신청/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 강의 시스템이 유지보수로 인해 잠시 내려간 상태라도 수강신청을 받는데 문제가 없다:
+상품 시스템은 구매/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 상품 시스템이 유지보수로 인해 잠시 내려간 상태라도 구매/결제를 하는데 문제가 없다: 
 ```
 # 강의 서비스 (lectureSystem) 를 잠시 내려놓음
 
