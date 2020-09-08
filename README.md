@@ -431,12 +431,12 @@ http POST localhost:8081/purchase productId=2   #Success
 ``` 
 
 ```
-#수강신청 완료상태 까지 Event 진행확인
+#결제 완료상태 까지 Event 진행확인
 ```
 ![장애격리(bought)](https://user-images.githubusercontent.com/68408645/92468824-bd713b80-f20e-11ea-8a60-017b89446e01.png)
 
 ```
-#강의 서비스 기동
+#상품 서비스 기동
 cd gaji-product
 mvn spring-boot:run
 
