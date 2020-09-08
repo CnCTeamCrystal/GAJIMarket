@@ -312,49 +312,47 @@ http localhost:8081/purchases
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 수강신청(courseRegistrationSystem)->결제(paymentSystem) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
+분석단계에서의 조건 중 하나로 구매(purchase)->결제(payment) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 
 ```
-# (courseRegistrationSystem) PaymentService.java
 
-@FeignClient(name ="paymentSystems", url="http://52.231.118.204:8080")
+@FeignClient(name="Payment", url="${api.url.payment}")
 public interface PaymentService {
-    @RequestMapping(method = RequestMethod.POST, value = "/paymentSystems", consumes = "application/json")
-    void makePayment(PaymentSystem paymentSystem);
+
+    @RequestMapping(method= RequestMethod.POST, path="/payments")
+    public void doPayment(@RequestBody Payment payment);
 
 }
 ```
 
-- 수강신청 직후(@PostPersist) 결제를 요청하도록 처리
+- Purchase(구매) 직후(@PostPersist) 결제를 요청하도록 처리
 ```
-#CourseRegistrationSystem.java (Entity)
+public class Purchase {
 
     @PostPersist
     public void onPostPersist(){
-        CourseRegistered courseRegistered = new CourseRegistered();
-        BeanUtils.copyProperties(this, courseRegistered);
-        courseRegistered.publish();
-
-        this.setLectureId(courseRegistered.getLectureId());
-        this.setStudentId(12334);
-        this.setStatus("수강신청중");
-
-        System.out.println("##### POST CourseRegistrationSystem 수강신청 : " + this);
+        Bought bought = new Bought();
+        BeanUtils.copyProperties(this, bought);
+        bought.publishAfterCommit();
 
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
-        PaymentSystem paymentSystem = new PaymentSystem();
-        paymentSystem.setCourseId(this.id);
+        GAJI.external.Payment payment = new GAJI.external.Payment();
         // mappings goes here
+        payment.setPurchaseId(this.getId());
+        payment.setProductId(this.getProductId());
+        payment.setStatus("Payment Completed");
 
-        //결제 시작
-        PaymentService paymentService = Application.applicationContext.getBean(PaymentService.class);
-        paymentService.makePayment(paymentSystem);
+        PurchaseApplication.applicationContext.getBean(GAJI.external.PaymentService.class)
+            .doPayment(payment);
+
 
     }
+
+}
 ```
 
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
@@ -364,22 +362,22 @@ public interface PaymentService {
 # 결제(paymentSystem) 서비스를 잠시 내려놓음
 
 #수강신청 처리
-http POST localhost:8081/courseRegistrationSystem lectureId=1   #Fail
-http POST localhost:8081/courseRegistrationSystem lectureId=2   #Fail
+http POST localhost:8081/Purchases productId=1   #Fail
+http POST localhost:8081/Purchases productId=2   #Fail
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857341-9a352380-8408-11ea-908a-d776d192bb8e.png)
+![termicate_payment](https://user-images.githubusercontent.com/68408645/92457945-c9093600-f1ff-11ea-8cae-59ecba5df3bb.png)
+
+![payment_500 error](https://user-images.githubusercontent.com/68408645/92458165-040b6980-f200-11ea-98c7-ffb01b04df80.png)
 
 ```
 #결제서비스 재기동
-cd paymentSystem
+cd gaji-payment
 mvn spring-boot:run
 
 #수강신청 처리
-http POST localhost:8081/courseRegistrationSystem lectureId=1   #Success
-http POST localhost:8081/courseRegistrationSystem lectureId=2   #Success
+http POST localhost:8081/Purchases productId=1   #Success
+http POST localhost:8081/Purchases productId=2   #Success
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857434-c05ac380-8408-11ea-88d4-8a6ce4af0100.png)
-
 
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
 
