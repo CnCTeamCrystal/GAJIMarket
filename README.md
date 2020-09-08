@@ -151,7 +151,9 @@
 
 ![eventstorming](https://user-images.githubusercontent.com/68408645/92440449-7e7bbf80-f1e7-11ea-94c9-e86822da492a.PNG)
 
-
+    - 
+    
+    
     - 강의 신청 시 결제처리 : 서비스는 강의를 제공하는 강사의 이익을 제공해야 하기 때문에 수강신청시 결제처리에 대해서는  Request-Response 방식 처리한다.
     - 강의 관리 기능은 서비스 제공의 측면이 강하며, 한 번 등록 시 여러명이 학생들이 수강신청을 하기 때문에 수강신청(Front)에 대해 강의관리 서비스는 Async (event-driven), Eventual Consistency 방식으로 처리한다.
     - 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다 Circuit breaker를 사용하여 
