@@ -3,7 +3,7 @@
 
 # 최종 조별과제 - 가지마켓 시스템
 
-- 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
+- 체크포인트 : https://workflowy.com/s/assessment/qJn45fBdVZn4atl3#/61a9026e22c1
 
 
 # Table of contents
@@ -49,6 +49,8 @@
 
 
 # 체크포인트
+
+
 
 - 분석 설계
 
