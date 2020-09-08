@@ -541,7 +541,7 @@ kubectl get deploy pay -w
 그 결과, 100%로 배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
 ![image](https://user-images.githubusercontent.com/18453570/79856578-79b89980-8407-11ea-9daf-697365e0a388.PNG)
 
-* 이후, Readiness와 Autoscaler를 제거한 상태에서 테스트를 진행하여 Availability의 변화를 확인함. 그 결과 20% 대로 떨어진 것을 확인할 수 있음.
+* 이후, Readiness와 Autoscaler를 제거한 상태에서 테스트를 진행하여 Availability의 변화를 확인함. 그 결과 89% 대로 떨어진 것을 확인할 수 있음.
 ![무정지 배포 쿼리](https://user-images.githubusercontent.com/68408645/92480377-c585a700-f21f-11ea-8a06-f97ec7aee32b.png)
 ![무정지 배포_log](https://user-images.githubusercontent.com/68408645/92480409-d46c5980-f21f-11ea-8666-0fe6ac1085d1.png)
 ![무정지 배포_결과](https://user-images.githubusercontent.com/68408645/92480435-dc2bfe00-f21f-11ea-962f-2582ccffdd4a.png)
