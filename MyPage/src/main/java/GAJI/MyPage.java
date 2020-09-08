@@ -10,11 +10,10 @@ public class MyPage {
         @Id
         @GeneratedValue(strategy=GenerationType.AUTO)
         private Long id;
-        private Long memberId;
-        private Long purchaseId;
+        private Long sellerId;
+        private Long buyerId;
         private Long productId;
         private String status;
-        private Long productId;
 
 
         public Long getId() {
@@ -24,19 +23,19 @@ public class MyPage {
         public void setId(Long id) {
             this.id = id;
         }
-        public Long getMemberId() {
-            return memberId;
+        public Long getSellerId() {
+            return sellerId;
         }
 
-        public void setMemberId(Long memberId) {
-            this.memberId = memberId;
+        public void setSellerId(Long sellerId) {
+            this.sellerId = sellerId;
         }
-        public Long getPurchaseId() {
-            return purchaseId;
+        public Long getBuyerId() {
+            return buyerId;
         }
 
-        public void setPurchaseId(Long purchaseId) {
-            this.purchaseId = purchaseId;
+        public void setBuyerId(Long buyerId) {
+            this.buyerId = buyerId;
         }
         public Long getProductId() {
             return productId;
@@ -51,13 +50,6 @@ public class MyPage {
 
         public void setStatus(String status) {
             this.status = status;
-        }
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
         }
 
 }

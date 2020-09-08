@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface MyPageRepository extends CrudRepository<MyPage, Long> {
 
-    List<MyPage> findByMemberId(Long memberId);
-    List<MyPage> findByProductId(Long productId);
-    List<MyPage> findByMemberId(Long memberId);
     List<MyPage> findByProductId(Long productId);
 
+    void deleteByProductId(Long productId);
 }

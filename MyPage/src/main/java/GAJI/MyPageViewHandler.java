@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,9 +25,9 @@ public class MyPageViewHandler {
                 // view 객체 생성
                 MyPage myPage = new MyPage();
                 // view 객체에 이벤트의 Value 를 set 함
-                myPage.setMemberId(registered.getMemberId());
                 myPage.setProductId(registered.getId());
                 myPage.setStatus(registered.getStatus());
+                myPage.setSellerId(registered.getMemberId());
                 // view 레파지 토리에 save
                 myPageRepository.save(myPage);
             }
@@ -41,17 +42,11 @@ public class MyPageViewHandler {
         try {
             if (bought.isMe()) {
                 // view 객체 조회
-                List<MyPage> myPageList = myPageRepository.findByMemberId(bought.getMemberId());
-                for(MyPage myPage : myPageList){
-                    // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    myPage.setStatus(bought.getStatus());
-                    // view 레파지 토리에 save
-                    myPageRepository.save(myPage);
-                }
                 List<MyPage> myPageList = myPageRepository.findByProductId(bought.getProductId());
                 for(MyPage myPage : myPageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     myPage.setStatus(bought.getStatus());
+                    myPage.setBuyerId(bought.getMemberId());
                     // view 레파지 토리에 save
                     myPageRepository.save(myPage);
                 }
@@ -65,17 +60,11 @@ public class MyPageViewHandler {
         try {
             if (canceled.isMe()) {
                 // view 객체 조회
-                List<MyPage> myPageList = myPageRepository.findByMemberId(canceled.getMemberId());
-                for(MyPage myPage : myPageList){
-                    // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    myPage.setStatus(canceled.getStatus());
-                    // view 레파지 토리에 save
-                    myPageRepository.save(myPage);
-                }
                 List<MyPage> myPageList = myPageRepository.findByProductId(canceled.getProductId());
                 for(MyPage myPage : myPageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     myPage.setStatus(canceled.getStatus());
+                    myPage.setBuyerId(null);
                     // view 레파지 토리에 save
                     myPageRepository.save(myPage);
                 }
@@ -85,4 +74,18 @@ public class MyPageViewHandler {
         }
     }
 
+    @StreamListener(KafkaProcessor.INPUT)
+    @Transactional
+    public void whenDeleted_then_DELETE_1(@Payload Deleted deleted) {
+        try {
+            if (deleted.isMe()) {
+                // view 레파지 토리에 삭제 쿼리
+                System.out.println("Deleted..................");
+                System.out.println(deleted.getId());
+                myPageRepository.deleteByProductId(deleted.getId());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
