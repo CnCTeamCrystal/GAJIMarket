@@ -504,7 +504,6 @@ hystrix:
 * 요청이 과도하여 CB를 동작함.
 ![circuit_log](https://user-images.githubusercontent.com/68408645/92469565-fb229400-f20f-11ea-9bac-e71824bde65b.png)
 
-
 ![circuit](https://user-images.githubusercontent.com/68408645/92460153-944aae00-f202-11ea-9eca-a6ddde0eb79f.png)
 
 - 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음. 하지만, 91.18% 가 성공하였고, 8.82%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
@@ -543,7 +542,9 @@ kubectl get deploy pay -w
 ![image](https://user-images.githubusercontent.com/18453570/79856578-79b89980-8407-11ea-9daf-697365e0a388.PNG)
 
 * 이후, Readiness와 Autoscaler를 제거한 상태에서 테스트를 진행하여 Availability의 변화를 확인함. 그 결과 20% 대로 떨어진 것을 확인할 수 있음.
-![image](https://user-images.githubusercontent.com/18453570/79856571-79200300-8407-11ea-84a9-946f3a2a076d.PNG)
+![무정지 배포 쿼리](https://user-images.githubusercontent.com/68408645/92480377-c585a700-f21f-11ea-8a06-f97ec7aee32b.png)
+![무정지 배포_log](https://user-images.githubusercontent.com/68408645/92480409-d46c5980-f21f-11ea-8666-0fe6ac1085d1.png)
+![무정지 배포_결과](https://user-images.githubusercontent.com/68408645/92480435-dc2bfe00-f21f-11ea-962f-2582ccffdd4a.png)
 
 
 
