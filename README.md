@@ -151,14 +151,12 @@
 
 ![eventstorming](https://user-images.githubusercontent.com/68408645/92440449-7e7bbf80-f1e7-11ea-94c9-e86822da492a.PNG)
 
-    - 
+    - 구매 신청시 결제 처리: 구매와 결제는 Data 일관성이 주요하기 때문에 Request-Response 방식으로 처리한다.
+    - 구매 결과에 대한 Feedback(Product 상태 Update, Purchase 상태 Update)은 Async (event-driven) 방식으로 처리 한다.
+    - 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다 (Circuit breaker를 사용)
+    - 사용자별 제품 구매 현황을 한번에 확인 할 수 있어야 한다(CQRS)
+    - 회원 탈퇴의 경우 회원이 등록한 상품을 Async 하게 삭제 한다.
     
-    
-    - 강의 신청 시 결제처리 : 서비스는 강의를 제공하는 강사의 이익을 제공해야 하기 때문에 수강신청시 결제처리에 대해서는  Request-Response 방식 처리한다.
-    - 강의 관리 기능은 서비스 제공의 측면이 강하며, 한 번 등록 시 여러명이 학생들이 수강신청을 하기 때문에 수강신청(Front)에 대해 강의관리 서비스는 Async (event-driven), Eventual Consistency 방식으로 처리한다.
-    - 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다 Circuit breaker를 사용하여 
-    - 학생이 강의관리에서 확인할 수 있는 수강신청내용을 수강신청시스템(프론트엔드)에서 확인할 수 있어야 한다 CQRS
-    - 결제를 제외한 나머지 inter-microservice 트랜잭션: 모든 이벤트에 대해 데이터 일관성의 시점이 크리티컬하지 않은 모든 경우가 대부분이라 판단, Eventual Consistency 를 기본으로 채택함.    
 
 
 ## 헥사고날 아키텍처 다이어그램 도출
