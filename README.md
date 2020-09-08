@@ -423,27 +423,27 @@ public class PolicyHandler{
 ```
 상품 시스템은 구매/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 상품 시스템이 유지보수로 인해 잠시 내려간 상태라도 구매/결제를 하는데 문제가 없다: 
 ```
-# 강의 서비스 (lectureSystem) 를 잠시 내려놓음
+# 상품 서비스 (product) 를 잠시 내려놓음
 
-#수강신청 처리
-http POST localhost:8081/courseRegistrationSystem lectureId=1   #Success
-http POST localhost:8081/courseRegistrationSystem lectureId=2   #Success
-```
-![image](https://user-images.githubusercontent.com/48303857/79857884-6d354080-8409-11ea-9307-02288463bb13.png)
+#구매(puchase) 처리
+http POST localhost:8081/purchase productId=1   #Success
+http POST localhost:8081/purchase productId=2   #Success
+``` 
 
 ```
 #수강신청 완료상태 까지 Event 진행확인
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857914-79b99900-8409-11ea-8658-030267f42214.png)
+![장애격리(bought)](https://user-images.githubusercontent.com/68408645/92468824-bd713b80-f20e-11ea-8a60-017b89446e01.png)
+
 ```
 #강의 서비스 기동
-cd lectureSystem
+cd gaji-product
 mvn spring-boot:run
 
-#강의수강인원 Update 확인
+#상품 Update 확인
 콘솔창에서 확인
 ```
-![image](https://user-images.githubusercontent.com/48303857/79857956-8f2ec300-8409-11ea-98dd-2dd3667855b5.png)
+![장애격리(product)](https://user-images.githubusercontent.com/68408645/92468877-d4b02900-f20e-11ea-975c-ace6f83635cc.png)
 
 # 운영
 
