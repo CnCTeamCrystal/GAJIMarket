@@ -45,7 +45,7 @@
     1. 상품서비스의 기능이 수행되지 않더라도 결제 기능은 365일 24시간 받을 수 있어야 한다  Async (event-driven), Eventual Consistency
     1. 결제시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도한다   Circuit breaker, fallback
 1. 성능
-    1. 고객이 자주 구매 정보(구매 내역, 취소 내역)를 조회할 수 있다.   CQRS
+    1. 고객이 자주 제품 및 구매 진행 상태를(구매 내역, 취소 내역)를 조회할 수 있다.   CQRS
 
 
 # 체크포인트
@@ -147,7 +147,7 @@
 
 ### 1차 모형에서 요구사항을 커버하도록 모델링됨 
 
-![image](https://user-images.githubusercontent.com/48303857/79814397-17d14300-83b9-11ea-8c7e-3517658dff13.png)
+![eventstorming](https://user-images.githubusercontent.com/68408645/92440449-7e7bbf80-f1e7-11ea-94c9-e86822da492a.PNG)
 
 
     - 강의 신청 시 결제처리 : 서비스는 강의를 제공하는 강사의 이익을 제공해야 하기 때문에 수강신청시 결제처리에 대해서는  Request-Response 방식 처리한다.
