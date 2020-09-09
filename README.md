@@ -450,7 +450,7 @@ mvn spring-boot:run
 ## CI/CD 설정
 
 
-각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 Azure를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 azure-pipeline.yml 에 포함되었다.
+각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 Azure를 사용하였으며, pipeline build script 는 각 프로젝트 kubernetes 폴더의 deployment.yml, service.yaml 에 포함되었다.
 
 - devops를 활용하여 pipeline을 구성하였고, CI CD 자동화를 구현하였다.
 ![cicd](https://user-images.githubusercontent.com/68408645/92461338-230bfa80-f204-11ea-8bdf-4687b6b69ed8.png)
