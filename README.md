@@ -509,6 +509,23 @@ hystrix:
 - 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음. 하지만, 91.18% 가 성공하였고, 8.82%가 실패했다는 것은 고객 사용성에 있어 좋지 않기 때문에 Retry 설정과 동적 Scale out (replica의 자동적 추가,HPA) 을 통하여 시스템을 확장 해주는 후속처리가 필요.
 
 
+## CQRS 적용
+
+
+* 등록 된 상품을 구매이력과 연계하여 사용자별 등록된 상품의 구매 진행 상태를 view로 구현함
+
+- 상품 등록
+
+![CQRS_상품](https://user-images.githubusercontent.com/68408645/92540166-b41fb780-f27e-11ea-8f14-10aa7f23149e.png)
+
+- 구매 처리
+
+![CQRS_구매](https://user-images.githubusercontent.com/68408645/92540193-beda4c80-f27e-11ea-882d-2a336e8b2b05.png)
+
+- My Page 조회
+
+![CQRS_mypage](https://user-images.githubusercontent.com/68408645/92540204-c7328780-f27e-11ea-8b98-592b74203c36.png)
+
 
 
 ### 오토스케일 아웃
