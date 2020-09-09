@@ -475,12 +475,17 @@ mvn spring-boot:run
 각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 Azure를 사용하였으며, pipeline build script 는 각 프로젝트 kubernetes 폴더의 deployment.yml, service.yaml 에 포함되었다.
 
 - devops를 활용하여 pipeline을 구성하였고, CI CD 자동화를 구현하였다.
+
 ![cicd](https://user-images.githubusercontent.com/68408645/92461338-230bfa80-f204-11ea-8bdf-4687b6b69ed8.png)
 
+
 - 아래와 같이 pod 가 정상적으로 올라간 것을 확인하였다.
+
 ![pod](https://user-images.githubusercontent.com/68408645/92461006-a711b280-f203-11ea-9169-20c0393b1114.PNG)
 
+
 - 아래와 같이 쿠버네티스에 모두 서비스로 등록된 것을 확인할 수 있다.
+
 ![kube all](https://user-images.githubusercontent.com/68408645/92461109-cb6d8f00-f203-11ea-81b6-e439b81ebf07.PNG)
 
 
