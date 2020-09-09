@@ -538,7 +538,7 @@ hystrix:
 
 
 - 결제서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 10프로를 넘어서면 아래와 같이 replica 가 10개까지 늘어 났다.
-```
+
 ![autoscale](https://user-images.githubusercontent.com/68408645/92545709-ab81ae00-f28b-11ea-9a31-6d4f11a0cbc2.png)
 
 
