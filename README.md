@@ -524,7 +524,7 @@ hystrix:
 - 20초 동안 10번 반복
 
 * 요청이 과도하여 CB를 동작함.
-![circuit_log](https://user-images.githubusercontent.com/68408645/92469565-fb229400-f20f-11ea-9bac-e71824bde65b.png)
+![circuit_log](https://user-images.githubusercontent.com/68408645/92546162-e20bf880-f28c-11ea-9846-c4a8280530a3.png)
 
 ![circuit](https://user-images.githubusercontent.com/68408645/92460153-944aae00-f202-11ea-9eca-a6ddde0eb79f.png)
 
