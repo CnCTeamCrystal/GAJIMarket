@@ -361,7 +361,7 @@ public class Purchase {
 ```
 # 결제(paymentSystem) 서비스를 잠시 내려놓음
 
-#수강신청 처리
+#구매 처리
 http POST localhost:8081/Purchases productId=1   #Fail
 http POST localhost:8081/Purchases productId=2   #Fail
 ```
@@ -374,7 +374,7 @@ http POST localhost:8081/Purchases productId=2   #Fail
 cd gaji-payment
 mvn spring-boot:run
 
-#수강신청 처리
+#구매 처리
 http POST localhost:8081/Purchases productId=1   #Success
 http POST localhost:8081/Purchases productId=2   #Success
 ```
